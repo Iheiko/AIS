@@ -22,6 +22,6 @@ cd entries
 
 PARTUUID=$(blkid | grep sda2 | grep -Po 'PARTUUID=.+$' | grep -Po "\".+\"" | sed -e "s/\"//g") 
 echo "PARTUUID=$PARTUUID"
-sed -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=ext4/' arch.conf
+sed -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
 
 echo DONE!!
