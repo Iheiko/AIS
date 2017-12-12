@@ -9,8 +9,8 @@ echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 
 echo "ArchVB" >> /etc/hostname
 
-echo "127.0.0.1	localhost.localdomain	localhost\
-::1		localhost.localdomain	localhost\
+echo -e "127.0.0.1	localhost.localdomain	localhost\n\
+::1		localhost.localdomain	localhost\n\
 127.0.1.1	ArchVB.localdomain	ArchVB" >> /etc/hosts
 
 bootctl --path=/boot install
