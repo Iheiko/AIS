@@ -17,6 +17,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 cp chrooted.sh /mnt/root/
 chmod a+x /mnt/root/chrooted.sh
-echo "bash /root/chrooted.sh" >> /mnt/root/.bashrc
 
-arch-chroot /mnt
+arch-chroot /mnt bash root/chrooted.sh
+
+umount -R /mnt
