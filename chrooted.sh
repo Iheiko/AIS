@@ -15,13 +15,13 @@ echo -e "127.0.0.1	localhost.localdomain	localhost\n\
 
 bootctl --path=/boot install
 
-cp /usr/shar/systemd/bootctl/* /boot/loader/
+cp /usr/share/systemd/bootctl/* /boot/loader/
 cd /boot/loader/
 mv arch.conf entries
 cd entries
 
 PARTUUID=$(blkid | grep sda2 | grep -Po 'PARTUUID=.+$' | grep -Po "\".+\"" | sed -e "s/\"//g") 
 echo "PARTUUID=$PARTUUID"
-sed -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
-
+sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
+passwd 
 echo DONE!!
