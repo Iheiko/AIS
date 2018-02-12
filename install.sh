@@ -19,5 +19,6 @@ cp chrooted.sh /mnt/root/
 chmod a+x /mnt/root/chrooted.sh
 
 arch-chroot /mnt bash root/chrooted.sh
+rm /mnt/root/chrooted.sh
 
 umount -R /mnt
