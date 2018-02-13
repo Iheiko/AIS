@@ -11,7 +11,7 @@ mount /dev/sda2 /mnt
 mkdir /mnt/boot
 mount /dev/sda1 /mnt/boot
 
-cat <(grep 'Russia' -A1 /etc/pacman.d/mirrorlist) <(grep -v 'Russia' -A1 /etc/pacman.d/mirrorlist) > .mirrorlist.tmp
+cat <(grep 'Russia' -A1 /etc/pacman.d/mirrorlist) <(grep -v 'Russia' -A1 /etc/pacman.d/mirrorlist) | sed -e 's/--//g' > .mirrorlist.tmp
 mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
 
 pacstrap /mnt base base-devel
