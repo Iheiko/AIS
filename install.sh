@@ -11,11 +11,14 @@ mount /dev/sda2 /mnt
 mkdir /mnt/boot
 mount /dev/sda1 /mnt/boot
 
+cat <(grep 'Russia' -A1 /etc/pacman.d/mirrorlist) <(grep -v 'Russia' -A1 /etc/pacman.d/mirrorlist) > .mirrorlist.tmp
+mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
+
 pacstrap /mnt base base-devel
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
-cp chrooted.sh /mnt/root/
+curl https://raw.githubusercontent.com/Iheiko/AIS/master/chrooted.sh >> /mnt/root/chrooted.sh
 chmod a+x /mnt/root/chrooted.sh
 
 arch-chroot /mnt bash root/chrooted.sh
