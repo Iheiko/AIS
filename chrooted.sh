@@ -7,8 +7,7 @@ echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 
-echo "ArchVB" >> /etc/hostname
-
+echo "ArchVB" >> /etc/hostname 
 echo -e "127.0.0.1	localhost.localdomain	localhost\n\
 ::1		localhost.localdomain	localhost\n\
 127.0.1.1	ArchVB.localdomain	ArchVB" >> /etc/hosts
@@ -24,4 +23,5 @@ PARTUUID=$(blkid | grep sda2 | grep -Po 'PARTUUID=.+$' | grep -Po "\".+\"" | sed
 echo "PARTUUID=$PARTUUID"
 sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
 passwd 
+systemctl enable dhcpcd
 echo DONE!!
