@@ -9,14 +9,11 @@ timedatectl set-ntp true
 
 #Make new GUID partition table with on /dev/sda
 #New partition table will be like:
-#/dev/sda1 /boot EFI  200M
+#/dev/sda1 /boot ESP  200M
 #/dev/sda2 /     ext4 rest
-printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" \
-    | fdisk /dev/sda
-yes y \
-    | mkfs.vfat /dev/sda1
-yes y \
-    | mkfs.ext4 /dev/sda2
+printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/sda
+yes y | mkfs.vfat /dev/sda1
+yes y | mkfs.ext4 /dev/sda2
 
 #Mount new parttions to /mnt
 mount /dev/sda2 /mnt
