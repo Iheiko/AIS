@@ -1,8 +1,8 @@
 #!/bin/bash
 
-ln -sf /usr/share/zoneinfo/Europ/Moscow /etc/localtime
-
+ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc
+
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
@@ -19,7 +19,7 @@ cd /boot/loader/
 mv arch.conf entries
 cd entries
 
-PARTUUID=$(blkid | grep sda2 | grep -Po 'PARTUUID=.+$' | grep -Po "\".+\"" | sed -e "s/\"//g") 
+PARTUUID=$(blkid -o value -s PARTUUID /dev/sda2)
 echo "PARTUUID=$PARTUUID"
 sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
 passwd 

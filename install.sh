@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PWD=$(pwd)
+
 timedatectl set-ntp true
 
 printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/sda
@@ -18,7 +20,7 @@ pacstrap /mnt base base-devel
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
-curl https://raw.githubusercontent.com/Iheiko/AIS/master/chrooted.sh >> /mnt/root/chrooted.sh
+cp $PWD/chrooted.sh /mnt/root/chrooted.sh
 chmod a+x /mnt/root/chrooted.sh
 
 arch-chroot /mnt bash root/chrooted.sh
