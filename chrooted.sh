@@ -7,11 +7,9 @@ ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc
 
 #Locale configuration. Set default locale to en_US.UTF-8.
-echo "en_US.UTF-8 UTF-8" \
-    >> /etc/locale.gen
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
-echo "LANG=en_US.UTF-8" \
-    >> /etc/locale.conf
+echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 
 #Hostname configuration
 #TODO:
@@ -19,8 +17,7 @@ echo "LANG=en_US.UTF-8" \
 echo "ArchVB" >> /etc/hostname 
 echo -e "127.0.0.1	localhost.localdomain	localhost\n\
 ::1		localhost.localdomain	localhost\n\
-127.0.1.1	ArchVB.localdomain	ArchVB" \
-    >> /etc/hosts
+127.0.1.1	ArchVB.localdomain	ArchVB" >> /etc/hosts
 
 #Bootloader installation. Deafault bootloader is systemd-boot
 bootctl --path=/boot install
