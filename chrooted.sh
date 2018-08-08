@@ -28,8 +28,8 @@ mv arch.conf entries
 cd entries
 PARTUUID=$(blkid -o value -s PARTUUID /dev/sda2)
 echo "PARTUUID=$PARTUUID"
-sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;\
-s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
+sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID\
+'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
 
 passwd 
 systemctl enable dhcpcd
