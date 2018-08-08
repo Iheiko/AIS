@@ -11,3 +11,10 @@ This script was made only for my personal use. If you really want to try it, fol
 6. `./install.sh`
 7. Reboot
 
+## Troubleshooting
+1. If you encounter something like this:
+```
+error: Partition / too full: 88218 blocks needed, 62335 blocks are free
+```
+Then you should resize your cowspace to, at least, 512Mb:
+`mount -o remount,size=512M /run/archiso/cowspace`
