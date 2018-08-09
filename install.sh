@@ -2,29 +2,51 @@
 #
 # Main install script
 
-#save current dirrectory path
+make_part() {
+    local disk=${1}
+    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/{$disk}
+    yes y | mkfs.vfat /dev/${disk}1
+    yes y | mkfs.ext4 /dev/${disk}2
+}
+mount_part() {
+    local disk = ${1}
+    mount /dev/${disk}2 /mnt
+    mkdir /mnt/boot
+    mount /dev/${disk}1 /mnt/boot
+}
+
+mirrorlist() {
+    local country=${1}
+    cat <(grep ${country} -A1 /etc/pacman.d/mirrorlist) \
+        <(grep -v ${country} -A1 /etc/pacman.d/mirrorlist) \
+        | sed -e 's/--//g' > .mirrorlist.tmp
+    mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
+}
+run_chrooted() {
+    local pwd=${1}
+    cp ${pwd}/chrooted.sh /mnt/root/chrooted.sh
+    chmod a+x /mnt/root/chrooted.sh
+    arch-chroot /mnt bash root/chrooted.sh
+    rm /mnt/root/chrooted.sh
+}
+
 PWD=$(pwd)
+DISK=sda
+COUNTRY="Russia"
 
 timedatectl set-ntp true
 
 #Make new GUID partition table with on /dev/sda
 #New partition table will be like:
-#/dev/sda1 /boot ESP  200M
-#/dev/sda2 /     ext4 rest
-printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/sda
-yes y | mkfs.vfat /dev/sda1
-yes y | mkfs.ext4 /dev/sda2
+#/dev/sdX1 /boot ESP  200M
+#/dev/sdX2 /     ext4 rest
+make_part ${DISK}
 
 #Mount new parttions to /mnt
-mount /dev/sda2 /mnt
-mkdir /mnt/boot
-mount /dev/sda1 /mnt/boot
+mount_part ${DISK}
 
 #Generate mirrorlist with Russian repo priority
-cat <(grep 'Russia' -A1 /etc/pacman.d/mirrorlist) \
-    <(grep -v 'Russia' -A1 /etc/pacman.d/mirrorlist) \
-    | sed -e 's/--//g' > .mirrorlist.tmp
-mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
+mirrorlist ${COUNTRY}
 
 pacstrap /mnt base base-devel
 
@@ -32,10 +54,7 @@ pacstrap /mnt base base-devel
 genfstab -U /mnt >> /mnt/etc/fstab
 
 #Run minor install script in chrooted environment
-cp $PWD/chrooted.sh /mnt/root/chrooted.sh
-chmod a+x /mnt/root/chrooted.sh
-arch-chroot /mnt bash root/chrooted.sh
-rm /mnt/root/chrooted.sh
+run_chrooted ${PWD}
 
 #Unmount all parttions from /mnt
 umount -R /mnt
