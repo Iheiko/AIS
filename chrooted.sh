@@ -32,8 +32,7 @@ setup_systemd_boot() {
 	cd entries
 	PARTUUID=$(blkid -o value -s PARTUUID /dev/${disk}2)
 	echo "PARTUUID=$PARTUUID"
-	sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID\
-	'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
+	sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
 }
 
 #Time configuration
