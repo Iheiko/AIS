@@ -2,6 +2,11 @@
 #
 # Main install script
 
+PWD=$(pwd)
+DISK=sda
+COUNTRY="Russia"
+PKG_LIST="base-devel"
+
 make_part() {
     local disk=${1}
     printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/${disk}
@@ -14,7 +19,6 @@ mount_part() {
     mkdir /mnt/boot
     mount /dev/${disk}1 /mnt/boot
 }
-
 mirrorlist() {
     local country=${1}
     cat <(grep ${country} -A1 /etc/pacman.d/mirrorlist) \
@@ -29,11 +33,6 @@ run_chrooted() {
     arch-chroot /mnt bash root/chrooted.sh
     rm /mnt/root/chrooted.sh
 }
-
-PWD=$(pwd)
-DISK=sda
-COUNTRY="Russia"
-PKG_LIST="base-devel"
 
 timedatectl set-ntp true
 
