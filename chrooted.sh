@@ -2,6 +2,10 @@
 #
 #Minor install script for chrooted environment
 
+if [ -z "${TIMEZONE}" ]; then
+    TIMEZONE="Europe/Moscow"
+fi
+
 set_time() {
 	local timezone=${1}
 	ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
@@ -21,10 +25,7 @@ set_hostname() {
 }
 setup_systemd_boot() {
 	local disk=${1}
-	#Bootloader installation. Deafault bootloader is systemd-boot.
 	bootctl --path=/boot install
-
-	#Bootloader configuration
 	cp /usr/share/systemd/bootctl/* /boot/loader/
 	cd /boot/loader/
 	mv arch.conf entries
@@ -37,8 +38,7 @@ setup_systemd_boot() {
 
 #Time configuration
 #Set timezone to Moscow and set the Hardware Clock from the System Clock
-set_time "Europe/Moscow"
-
+set_time ${TIMEZONE}
 
 #Locale configuration. Set default locale to en_US.UTF-8.
 set_locale

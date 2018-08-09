@@ -3,21 +3,21 @@
 # Main install script
 
 PWD=$(pwd)
-DISK=sda
+DISK=/dev/sda
 COUNTRY="Russia"
 PKG_LIST="base-devel"
 
 make_part() {
     local disk=${1}
-    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/${disk}
-    yes y | mkfs.vfat /dev/${disk}1
-    yes y | mkfs.ext4 /dev/${disk}2
+    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
+    yes y | mkfs.vfat ${disk}1
+    yes y | mkfs.ext4 ${disk}2
 }
 mount_part() {
     local disk=${1}
-    mount /dev/${disk}2 /mnt
+    mount ${disk}2 /mnt
     mkdir /mnt/boot
-    mount /dev/${disk}1 /mnt/boot
+    mount ${disk}1 /mnt/boot
 }
 mirrorlist() {
     local country=${1}
