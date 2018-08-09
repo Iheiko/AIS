@@ -4,12 +4,12 @@
 
 make_part() {
     local disk=${1}
-    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/{$disk}
+    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk /dev/${disk}
     yes y | mkfs.vfat /dev/${disk}1
     yes y | mkfs.ext4 /dev/${disk}2
 }
 mount_part() {
-    local disk = ${1}
+    local disk=${1}
     mount /dev/${disk}2 /mnt
     mkdir /mnt/boot
     mount /dev/${disk}1 /mnt/boot
@@ -33,6 +33,7 @@ run_chrooted() {
 PWD=$(pwd)
 DISK=sda
 COUNTRY="Russia"
+PKG_LIST="base-devel"
 
 timedatectl set-ntp true
 
@@ -48,7 +49,7 @@ mount_part ${DISK}
 #Generate mirrorlist with Russian repo priority
 mirrorlist ${COUNTRY}
 
-pacstrap /mnt base base-devel
+pacstrap /mnt base ${PKG_LIST}
 
 #Save current mount state
 genfstab -U /mnt >> /mnt/etc/fstab
