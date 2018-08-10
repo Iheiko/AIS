@@ -78,7 +78,7 @@ while [[ $# -gt 0 ]]; do
         TIMEZONE="$2"
         shift 2
         ;;
-    -H|--Hostname)
+    -H|--hostname)
         HOSTNAME="$2"
         shift 2
         ;;
