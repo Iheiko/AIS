@@ -67,12 +67,11 @@ if (($# == 0 )); then
 fi
 
 #TODO:
-# --manual|-m 
-# --esp|-e
-# --root|-r
 # --swap|-s
 # --with-swap 
 # --bootloader|-b   
+# --lvm
+# --LUKS/--dm-crypt
 while [[ $# -gt 0 ]]; do
     case "$1" in 
     -h|--help)
