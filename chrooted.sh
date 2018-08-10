@@ -5,6 +5,9 @@
 if [ -z "${TIMEZONE}" ]; then
     TIMEZONE="Europe/Moscow"
 fi
+if [ -z "${HOSTNAME}" ]; then
+    HOSTNAME="Arch"
+fi
 
 set_time() {
     local timezone=${1}
@@ -23,7 +26,7 @@ set_hostname() {
     ::1     localhost.localdomain   localhost\n\
     127.0.1.1   ${hname}.localdomain    ${hname}" >> /etc/hosts
 }
-setup_systemd_boot() {
+setup_systemd-boot() {
     local disk=${1}
     bootctl --path=/boot install
     cp /usr/share/systemd/bootctl/* /boot/loader/
@@ -37,16 +40,16 @@ setup_systemd_boot() {
 
 #Time configuration
 #Set timezone to Moscow and set the Hardware Clock from the System Clock
-set_time ${TIMEZONE}
+set_time "${TIMEZONE}"
 
 #Locale configuration. Set default locale to en_US.UTF-8.
 set_locale
 
 #Hostname configuration
-set_hostname ArchVB
+set_hostname "${HOSTNAME}"
 
 #Install and configure systemd-boot
-setup_systemd_boot ${DISK}
+setup_systemd-boot ${DISK}
 
 passwd 
 systemctl enable dhcpcd

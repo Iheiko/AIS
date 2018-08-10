@@ -8,13 +8,14 @@ COUNTRY="Russia"
 PKG_LIST=""
 
 usage() {
-echo "Usage: $0 [-hdcpt]
+echo "Usage: $0 [-hdcptH]
 Options:
-    -h|--help                   print this message
-    -d|--disk     [Disk]        Specify disk for installation. Default:\"/dev/sda\"
-    -c|--country  [Country]     Select country for mirrolist priority. Default: Russia
-    -p|--pkg-list [Package ...] Additional packeges ex:\"base-devel vim iw dialog\" 
-    -t|--timezone [Region/City] Specify timezone Default:\"Europe/Moscow\"
+    -h|--help                    print this message
+    -d|--disk      [Disk]        Specify disk for installation. Default:\"/dev/sda\"
+    -c|--country   [Country]     Select country for mirrolist priority. Default: Russia
+    -p|--pkg-list  [Package ...] Additional packeges ex:\"base-devel vim iw dialog\" 
+    -t|--timezone  [Region/City] Specify timezone Default:\"Europe/Moscow\"
+    -H|--hostname  [Hostname]    Hostname Default:\"Arch\"
     "
 }
 make_part() {
@@ -37,10 +38,9 @@ mirrorlist() {
     mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
 }
 run_chrooted() {
-    local pwd=${1}
-    cp ${pwd}/chrooted.sh /mnt/root/chrooted.sh
+    cp ${PWD}/chrooted.sh /mnt/root/chrooted.sh
     chmod a+x /mnt/root/chrooted.sh
-    arch-chroot /mnt env DISK="${DISK}" TIMEZONE="${TIMEZONE}" bash root/chrooted.sh
+    arch-chroot /mnt env DISK="${DISK}" TIMEZONE="${TIMEZONE}" HOSTNAME="${HOSTNAME}" bash root/chrooted.sh
     rm /mnt/root/chrooted.sh
 }
 
@@ -78,6 +78,10 @@ while [[ $# -gt 0 ]]; do
         TIMEZONE="$2"
         shift 2
         ;;
+    -H|--Hostname)
+        HOSTNAME="$2"
+        shift 2
+        ;;
     esac
 done
 
@@ -101,7 +105,7 @@ pacstrap /mnt base ${PKG_LIST}
 genfstab -U /mnt >> /mnt/etc/fstab
 
 #Run minor install script in chrooted environment
-run_chrooted ${PWD}
+run_chrooted 
 
 #Unmount all parttions from /mnt
 umount -R /mnt
