@@ -20,17 +20,21 @@ Options:
     -p|--pkg-list  <Package ...> Additional packages to install
     -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
     -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
+    -m|--manual                  For manual partition select. --disk will be ignored.
+    -r|--root                    Root partition. Only needed if --manual
+    -e|--esp                     EFI system partiton. Only needed if --manual
     "
 }
-make_part() {
-    local disk=${1}
-    local root=${2}
-    local esp=${3}
-    if [ -z "${MANUAL}" ]; then
-        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
-    fi
+format_part() {
+    local root=${1}
+    local esp=${2}
     yes y | mkfs.vfat $esp
     yes y | mkfs.ext4 $root
+}
+
+make_part() {
+    local disk=${1}
+    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
 }
 mount_part() {
     local root=${1}
@@ -122,7 +126,12 @@ timedatectl set-ntp true
 #New partition table will be like:
 #/dev/sdX1 /boot ESP  200M
 #/dev/sdX2 /     ext4 rest
-make_part ${DISK} ${ROOT} ${ESP}
+if [ -z "${MANUAL}" ]; then
+    make_part ${DISK} 
+fi
+
+#Format ESP to vfat and ROOT to ext4
+format_part ${ROOT} ${ESP}
 
 #Mount new parttions to /mnt
 mount_part ${ROOT} ${ESP}
