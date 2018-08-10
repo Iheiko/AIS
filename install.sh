@@ -15,8 +15,8 @@ usage() {
 echo "Usage: $0 -d <Disk> [-hdcptHm]
 Options:
     -h|--help                    print this message
-    -d|--disk      <Disk>        Specify disk for installation. Default:\"/dev/sda\"
-    -c|--country   <Country>     Select country for mirrolist priority. Default: None
+    -d|--disk      <Disk>        Specify disk for installation. 
+    -c|--country   <Country>     Country for mirrorlist priority. Default: None
     -p|--pkg-list  <Package ...> Additional packages to install
     -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
     -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
