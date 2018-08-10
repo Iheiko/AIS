@@ -3,7 +3,7 @@
 #Minor install script for chrooted environment
 
 if [ -z "${TIMEZONE}" ]; then
-    TIMEZONE="Europe/Moscow"
+    TIMEZONE="UTC"
 fi
 if [ -z "${HOSTNAME}" ]; then
     HOSTNAME="Arch"
@@ -23,17 +23,17 @@ set_hostname() {
     local hname=${1}
     echo ${hname} >> /etc/hostname 
     echo -e "127.0.0.1  localhost.localdomain   localhost\n\
-    ::1     localhost.localdomain   localhost\n\
-    127.0.1.1   ${hname}.localdomain    ${hname}" >> /etc/hosts
+::1     localhost.localdomain   localhost\n\
+127.0.1.1   ${hname}.localdomain    ${hname}" >> /etc/hosts
 }
 setup_systemd-boot() {
-    local disk=${1}
+    local root=${1}
     bootctl --path=/boot install
     cp /usr/share/systemd/bootctl/* /boot/loader/
     cd /boot/loader/
     mv arch.conf entries
     cd entries
-    PARTUUID=$(blkid -o value -s PARTUUID ${disk}2)
+    PARTUUID=$(blkid -o value -s PARTUUID "${root}")
     echo "PARTUUID=$PARTUUID"
     sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
 }
@@ -49,7 +49,7 @@ set_locale
 set_hostname "${HOSTNAME}"
 
 #Install and configure systemd-boot
-setup_systemd-boot ${DISK}
+setup_systemd-boot ${ROOT} 
 
 passwd 
 systemctl enable dhcpcd
