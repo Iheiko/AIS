@@ -5,7 +5,7 @@
 PWD=$(pwd)
 DISK=/dev/sda
 COUNTRY="Russia"
-PKG_LIST="base-devel"
+PKG_LIST=""
 
 usage() {
 echo "Usage: $0 [-hdcpt]
@@ -69,7 +69,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     -p|--pkg-list)
         shift
-        while [ -n "$1" -a "${1:0:1}" != '-']; do
+        while [ -n "$1" -a "${1:0:1}" != '-' ]; do
             PKG_LIST+=" $1"
             shift
         done
