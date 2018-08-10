@@ -11,11 +11,11 @@ usage() {
 echo "Usage: $0 [-hdcptH]
 Options:
     -h|--help                    print this message
-    -d|--disk      [Disk]        Specify disk for installation. Default:\"/dev/sda\"
-    -c|--country   [Country]     Select country for mirrolist priority. Default: Russia
-    -p|--pkg-list  [Package ...] Additional packeges ex:\"base-devel vim iw dialog\" 
-    -t|--timezone  [Region/City] Specify timezone Default:\"Europe/Moscow\"
-    -H|--hostname  [Hostname]    Hostname Default:\"Arch\"
+    -d|--disk      <Disk>        Specify disk for installation. Default:\"/dev/sda\"
+    -c|--country   <Country>     Select country for mirrolist priority. Default: Russia
+    -p|--pkg-list  <Package ...> Additional packeges ex:\"base-devel vim iw dialog\" 
+    -t|--timezone  <Region/City> Specify timezone Default:\"Europe/Moscow\"
+    -H|--hostname  <Hostname>    Hostname Default:\"Arch\"
     "
 }
 make_part() {
