@@ -23,8 +23,8 @@ set_hostname() {
     local hname=${1}
     echo ${hname} >> /etc/hostname 
     echo -e "127.0.0.1  localhost.localdomain   localhost\n\
-    ::1     localhost.localdomain   localhost\n\
-    127.0.1.1   ${hname}.localdomain    ${hname}" >> /etc/hosts
+::1     localhost.localdomain   localhost\n\
+127.0.1.1   ${hname}.localdomain    ${hname}" >> /etc/hosts
 }
 setup_systemd-boot() {
     local root=${1}
