@@ -21,7 +21,7 @@ Options:
     -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
     -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
     -m|--manual                  For manual partition select. --disk will be ignored.
-    -r|--root                    Root partition. Only needed if --manual
+    -r|--root                    Root partition(/). Only needed if --manual
     -e|--esp                     EFI system partiton. Only needed if --manual
     "
 }
@@ -114,6 +114,14 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
+
+if [ -n "${MANUAL}" ]; then
+    if [ -z "${ESP}" ]; then
+        echo "--esp must be specified for --manual"
+    elif [ -z "${ROOT}" ]; then
+        echo "--root must be specified for --manual"
+    fi
+fi
 
 if [ -z "${MANUAL}" ]; then
     ESP="${DISK}1"
