@@ -12,7 +12,7 @@ ESP=""
 
 
 usage() {
-echo "Usage: $0 -d <Disk> [-hdcptHm]
+echo "Usage: $0 -d <Disk> [-hdcptHmre]
 Options:
     -h|--help                    print this message
     -d|--disk      <Disk>        Specify disk for installation. 
@@ -20,7 +20,7 @@ Options:
     -p|--pkg-list  <Package ...> Additional packages to install
     -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
     -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
-    -m|--manual                  For manual partition select. --disk will be ignored.
+    -m|--manual                  For manual partition selection. --disk will be ignored.
     -r|--root                    Root partition(/). Only needed if --manual
     -e|--esp                     EFI system partiton. Only needed if --manual
     "
@@ -124,8 +124,10 @@ done
 if [ -n "${MANUAL}" ]; then
     if [ -z "${ESP}" ]; then
         echo "--esp must be specified for --manual"
+        exit
     elif [ -z "${ROOT}" ]; then
         echo "--root must be specified for --manual"
+        exit
     fi
 fi
 
