@@ -6,9 +6,13 @@ PWD="${0%/*}"
 DISK=/dev/sda
 COUNTRY="Russia"
 PKG_LIST=""
+MANUAL=""
+ROOT=""
+ESP=""
+
 
 usage() {
-echo "Usage: $0 -d <Disk> [-hdcptH]
+echo "Usage: $0 -d <Disk> [-hdcptHm]
 Options:
     -h|--help                    print this message
     -d|--disk      <Disk>        Specify disk for installation. Default:\"/dev/sda\"
@@ -20,15 +24,20 @@ Options:
 }
 make_part() {
     local disk=${1}
-    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
-    yes y | mkfs.vfat ${disk}1
-    yes y | mkfs.ext4 ${disk}2
+    local root=${2}
+    local esp=${3}
+    if [ -z "${MANUAL}" ]; then
+        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
+    fi
+    yes y | mkfs.vfat $esp
+    yes y | mkfs.ext4 $root
 }
 mount_part() {
-    local disk=${1}
-    mount ${disk}2 /mnt
+    local root=${1}
+    local esp=${2}
+    mount ${root} /mnt
     mkdir /mnt/boot
-    mount ${disk}1 /mnt/boot
+    mount ${esp} /mnt/boot
 }
 mirrorlist() {
     local country=${1}
@@ -40,7 +49,10 @@ mirrorlist() {
 run_chrooted() {
     cp ${PWD}/chrooted.sh /mnt/root/chrooted.sh
     chmod a+x /mnt/root/chrooted.sh
-    arch-chroot /mnt env DISK="${DISK}" TIMEZONE="${TIMEZONE}" HOSTNAME="${HOSTNAME}" bash root/chrooted.sh
+    arch-chroot /mnt \
+        env DISK="${DISK}" TIMEZONE="${TIMEZONE}" HOSTNAME="${HOSTNAME}" \
+        ESP="${ESP}" ROOT="${ROOT}" \
+        bash root/chrooted.sh
     rm /mnt/root/chrooted.sh
 }
 
@@ -84,19 +96,36 @@ while [[ $# -gt 0 ]]; do
         HOSTNAME="$2"
         shift 2
         ;;
+    -m|--manual)
+        MANUAL="true"
+        shift
+        ;;
+    -r|--root)
+        ROOT="$2"
+        shift 2
+        ;;
+    -e|--esp)
+        ESP="$2"
+        shift 2
+        ;;
     esac
 done
 
+if [ -z "${MANUAL}" ]; then
+    ESP="${DISK}1"
+    ROOT="${DISK}2"
+fi
+
 timedatectl set-ntp true
 
-#Make new GUID partition table with on /dev/sda
+#If not --manual set then new GUID partition table will be created on $DISK
 #New partition table will be like:
 #/dev/sdX1 /boot ESP  200M
 #/dev/sdX2 /     ext4 rest
-make_part ${DISK}
+make_part ${DISK} ${ROOT} ${ESP}
 
 #Mount new parttions to /mnt
-mount_part ${DISK}
+mount_part ${ROOT} ${ESP}
 
 #Generate mirrorlist with Russian repo priority
 if [ -n "${COUNTRY}" ]; then
