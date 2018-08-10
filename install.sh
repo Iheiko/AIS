@@ -17,9 +17,9 @@ Options:
     -h|--help                    print this message
     -d|--disk      <Disk>        Specify disk for installation. Default:\"/dev/sda\"
     -c|--country   <Country>     Select country for mirrolist priority. Default: None
-    -p|--pkg-list  <Package ...> Additional packeges ex:\"base-devel vim iw dialog\" 
+    -p|--pkg-list  <Package ...> Additional packages to install
     -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
-    -H|--hostname  <Hostname>    Hostname Default:\"Arch\"
+    -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
     "
 }
 make_part() {
