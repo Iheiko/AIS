@@ -7,6 +7,43 @@ DISK=/dev/sda
 COUNTRY="Russia"
 PKG_LIST="base-devel"
 
+usage() {
+echo "Usage: $0 [-hdcpt]
+Options:
+    -h|--help                   print this message
+    -d|--disk     [Disk]        Specify disk for installation. Default:\"/dev/sda\"
+    -c|--country  [Country]     Select country for mirrolist priority. Default: Russia
+    -p|--pkg-list [Package ...] Additional packeges ex:\"base-devel vim iw dialog\" 
+    -t|--timezone [Region/City] Specify timezone Default:\"Europe/Moscow\"
+    "
+}
+make_part() {
+    local disk=${1}
+    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
+    yes y | mkfs.vfat ${disk}1
+    yes y | mkfs.ext4 ${disk}2
+}
+mount_part() {
+    local disk=${1}
+    mount ${disk}2 /mnt
+    mkdir /mnt/boot
+    mount ${disk}1 /mnt/boot
+}
+mirrorlist() {
+    local country=${1}
+    cat <(grep ${country} -A1 /etc/pacman.d/mirrorlist) \
+        <(grep -v ${country} -A1 /etc/pacman.d/mirrorlist) \
+        | sed -e 's/--//g' > .mirrorlist.tmp
+    mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
+}
+run_chrooted() {
+    local pwd=${1}
+    cp ${pwd}/chrooted.sh /mnt/root/chrooted.sh
+    chmod a+x /mnt/root/chrooted.sh
+    arch-chroot /mnt bash root/chrooted.sh
+    rm /mnt/root/chrooted.sh
+}
+
 # --help|-h
 # --disk|-d
 # --conuntr|-c
@@ -43,43 +80,6 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
-
-usage() {
-echo "Usage: $0 [-hdcpt]
-Options:
-    -h|--help                   print this message
-    -d|--disk     [Disk]        Specify disk for installation. Default:\"/dev/sda\"
-    -c|--country  [Country]     Select country for mirrolist priority. Default: Russia
-    -p|--pkg-list [Package ...] Additional packeges to install durint pacstraping ex:\"base-devel vim iw dialog\" Default: None
-    -t|--timezone [Region/City] Specify timezone Default:\"Europe/Moscow\"
-    "
-}
-make_part() {
-    local disk=${1}
-    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
-    yes y | mkfs.vfat ${disk}1
-    yes y | mkfs.ext4 ${disk}2
-}
-mount_part() {
-    local disk=${1}
-    mount ${disk}2 /mnt
-    mkdir /mnt/boot
-    mount ${disk}1 /mnt/boot
-}
-mirrorlist() {
-    local country=${1}
-    cat <(grep ${country} -A1 /etc/pacman.d/mirrorlist) \
-        <(grep -v ${country} -A1 /etc/pacman.d/mirrorlist) \
-        | sed -e 's/--//g' > .mirrorlist.tmp
-    mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
-}
-run_chrooted() {
-    local pwd=${1}
-    cp ${pwd}/chrooted.sh /mnt/root/chrooted.sh
-    chmod a+x /mnt/root/chrooted.sh
-    arch-chroot /mnt bash root/chrooted.sh
-    rm /mnt/root/chrooted.sh
-}
 
 timedatectl set-ntp true
 
