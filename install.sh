@@ -7,6 +7,53 @@ DISK=/dev/sda
 COUNTRY="Russia"
 PKG_LIST="base-devel"
 
+# --help|-h
+# --disk|-d
+# --conuntr|-c
+# --pkg-list|-p
+# --timezone|-t
+#TODO:
+# --esp|-e
+# --root|-r
+# --with-swap|-s
+while [[ $# -gt 0 ]]; do
+    case "$1" in 
+    -h|--help)
+        usage
+        exit
+        ;;
+    -d|--disk)
+        DISK="$2"
+        shift 2
+        ;;
+    -c|--country)
+        COUNTRY="$2"
+        shift 2
+        ;;
+    -p|--pkg-list)
+        shift
+        while [ -n "$1" -a "${1:0:1}" != '-']; do
+            PKG_LIST+=" $1"
+            shift
+        done
+        ;;
+    -t|--timezone)
+        TIMEZONE="$2"
+        shift 2
+        ;;
+    esac
+done
+
+usage() {
+echo "Usage: $0 [-hdcpt]
+Options:
+    -h|--help                   print this message
+    -d|--disk     [Disk]        Specify disk for installation. Default:\"/dev/sda\"
+    -c|--country  [Country]     Select country for mirrolist priority. Default: Russia
+    -p|--pkg-list [Package ...] Additional packeges to install durint pacstraping ex:\"base-devel vim iw dialog\" Default: None
+    -t|--timezone [Region/City] Specify timezone Default:\"Europe/Moscow\"
+    "
+}
 make_part() {
     local disk=${1}
     printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
