@@ -60,6 +60,12 @@ run_chrooted() {
     rm /mnt/root/chrooted.sh
 }
 
+#Exit if there is no args, 
+if (($# == 0 )); then 
+    usage
+    exit
+fi
+
 #TODO:
 # --manual|-m 
 # --esp|-e
