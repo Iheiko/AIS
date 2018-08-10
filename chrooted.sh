@@ -3,7 +3,7 @@
 #Minor install script for chrooted environment
 
 if [ -z "${TIMEZONE}" ]; then
-    TIMEZONE="Europe/Moscow"
+    TIMEZONE="UTC"
 fi
 if [ -z "${HOSTNAME}" ]; then
     HOSTNAME="Arch"

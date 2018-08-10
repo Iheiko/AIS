@@ -8,13 +8,13 @@ COUNTRY="Russia"
 PKG_LIST=""
 
 usage() {
-echo "Usage: $0 [-hdcptH]
+echo "Usage: $0 -d <Disk> [-hdcptH]
 Options:
     -h|--help                    print this message
     -d|--disk      <Disk>        Specify disk for installation. Default:\"/dev/sda\"
-    -c|--country   <Country>     Select country for mirrolist priority. Default: Russia
+    -c|--country   <Country>     Select country for mirrolist priority. Default: None
     -p|--pkg-list  <Package ...> Additional packeges ex:\"base-devel vim iw dialog\" 
-    -t|--timezone  <Region/City> Specify timezone Default:\"Europe/Moscow\"
+    -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
     -H|--hostname  <Hostname>    Hostname Default:\"Arch\"
     "
 }
@@ -44,15 +44,13 @@ run_chrooted() {
     rm /mnt/root/chrooted.sh
 }
 
-# --help|-h
-# --disk|-d
-# --conuntr|-c
-# --pkg-list|-p
-# --timezone|-t
 #TODO:
+# --manual|-m 
 # --esp|-e
 # --root|-r
-# --with-swap|-s
+# --swap|-s
+# --with-swap 
+# --bootloader|-b   
 while [[ $# -gt 0 ]]; do
     case "$1" in 
     -h|--help)
@@ -60,6 +58,10 @@ while [[ $# -gt 0 ]]; do
         exit
         ;;
     -d|--disk)
+        if [ "${2:0:1}" == '-' ]; then
+            usage
+            exit
+        fi
         DISK="$2"
         shift 2
         ;;
@@ -97,7 +99,9 @@ make_part ${DISK}
 mount_part ${DISK}
 
 #Generate mirrorlist with Russian repo priority
-mirrorlist ${COUNTRY}
+if [ -n "${COUNTRY}" ]; then
+    mirrorlist ${COUNTRY}
+fi
 
 pacstrap /mnt base ${PKG_LIST}
 
