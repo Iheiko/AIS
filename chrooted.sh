@@ -30,7 +30,7 @@ setup_systemd_boot() {
     cd /boot/loader/
     mv arch.conf entries
     cd entries
-    PARTUUID=$(blkid -o value -s PARTUUID /dev/${disk}2)
+    PARTUUID=$(blkid -o value -s PARTUUID ${disk}2)
     echo "PARTUUID=$PARTUUID"
     sed -i -e 's/PARTUUID=XXXX/PARTUUID='$PARTUUID'/;s/rootfstype=XXXX/rootfstype=ext4/' arch.conf
 }
@@ -46,7 +46,7 @@ set_locale
 set_hostname ArchVB
 
 #Install and configure systemd-boot
-setup_systemd_boot sda
+setup_systemd_boot ${DISK}
 
 passwd 
 systemctl enable dhcpcd

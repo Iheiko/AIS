@@ -2,7 +2,7 @@
 #
 # Main install script
 
-PWD=$(pwd)
+PWD="${0%/*}"
 DISK=/dev/sda
 COUNTRY="Russia"
 PKG_LIST=""
@@ -40,7 +40,7 @@ run_chrooted() {
     local pwd=${1}
     cp ${pwd}/chrooted.sh /mnt/root/chrooted.sh
     chmod a+x /mnt/root/chrooted.sh
-    arch-chroot /mnt bash root/chrooted.sh
+    arch-chroot /mnt env DISK="${DISK}" TIMEZONE="${TIMEZONE}" bash root/chrooted.sh
     rm /mnt/root/chrooted.sh
 }
 
