@@ -12,9 +12,7 @@ ESP=""
 SWAP=""
 SWAP_SIZE=""
 
-
-usage() {
-echo "Usage: $0 (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHre]
+usage() { echo "Usage: $0 (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHre]
 Required:
     -d|--disk      <Disk>        Specify disk for automated partion creation installation. 
     -m|--manual                  For manual partition selection. --disk will be ignored.
@@ -33,7 +31,8 @@ Options:
 }
 check_size(){
     local size="${1}"
-    if [ $(echo "${size}" | grep -Po "\d+[KMGTP]") == "${size}" ]; then
+    local check=$(echo "${size}" | grep -Po "\d+[KMGTP]")
+    if [ "${size}" != "${check}" ]; then
         echo "Wrong size ${size}, must be: size{K,M,G,T,P}"
         exit
     fi  
@@ -51,7 +50,7 @@ make_part() {
     if [ -z "${swap_size}" ]; then
         printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
     else
-        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n+${swap_size}\nt\n19\nn\n\n\n\nw\n" | fidsk ${disk}
+        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n+${swap_size}\nt\n2\n19\nn\n\n\n\nw\n" | fdisk ${disk}
     fi
 }
 mount_part() {
@@ -96,7 +95,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     -d|--disk)
         if [ "${2:0:1}" == '-' ]; then
-            usage
+            echo "--disk cant be empty"
             exit
         fi
         DISK="$2"
@@ -126,10 +125,18 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
     -r|--root)
+        if [ "${2:0:1}" == '-' ]; then
+            echo "--root cant be empty"
+            exit
+        fi
         ROOT="$2"
         shift 2
         ;;
     -e|--esp)
+        if [ "${2:0:1}" == '-' ]; then
+            echo "--esp cant be empty"
+            exit
+        fi
         ESP="$2"
         shift 2
         ;;
