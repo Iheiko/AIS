@@ -3,8 +3,8 @@
 # Main install script
 
 PWD="${0%/*}"
-DISK=/dev/sda
-COUNTRY="Russia"
+DISK=""
+COUNTRY=""
 PKG_LIST=""
 MANUAL=""
 ROOT=""
