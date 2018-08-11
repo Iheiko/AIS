@@ -40,7 +40,7 @@ check_size(){
     local size="${1}"
     local check=$(echo "${size}" | grep -Po "\d+[KMGTP]")
     if [ "${size}" != "${check}" ]; then
-        echo "Wrong size ${size}, must be: size{K,M,G,T,P}" >&2
+        echo "Error: Wrong size ${size}, must be: size{K,M,G,T,P}" >&2
         exit 
     fi  
 }
@@ -151,7 +151,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     *)
-        echo "Wrong argument: $1"
+        echo "Erorr: unknown argument $1"
         exit
         ;;
     esac
@@ -162,7 +162,7 @@ if [ -z "${MANUAL}" -a -z "${DISK}" ]; then
     exit
 fi
 
-#Check --root and --esp was specified for --manual
+#If --manual, then check --root and --esp was specified for --manual
 if [ -n "${MANUAL}" ]; then
     if [ -z "${ESP}" ]; then
         echo "--esp must be specified for --manual"
@@ -184,10 +184,10 @@ fi
 
 timedatectl set-ntp true
 
-#If not --manual set then new GUID partition table will be created on $DISK
+#If not --manual then new GUID partition table will be created on $DISK
 #New partition table will be like:
 #$ESP /boot ESP  200M
-#$SWAP?          SIZE
+#$SWAP?          $SWAP_SIZE
 #$ROOT /    ext4 rest
 if [ -z "${MANUAL}" ]; then
     make_part ${DISK} ${SWAP_SIZE} 
@@ -198,24 +198,20 @@ if [ -n "${SWAP}" ]; then
     swapon "${SWAP}"
 fi
 
-#Format ESP to vfat and ROOT to ext4
 format_part ${ROOT} ${ESP}
 
-#Mount new parttions to /mnt
 mount_part ${ROOT} ${ESP}
 
-#Generate mirrorlist with Russian repo priority
+#Generate mirrorlist with $COUNTRY repo priority if provided
 if [ -n "${COUNTRY}" ]; then
     mirrorlist ${COUNTRY}
 fi
 
 pacstrap /mnt base ${PKG_LIST}
 
-#Save current mount state
 genfstab -U /mnt >> /mnt/etc/fstab
 
 #Run minor install script in chrooted environment
 run_chrooted 
 
-#Unmount all parttions from /mnt
 umount -R /mnt
