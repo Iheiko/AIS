@@ -9,21 +9,33 @@ PKG_LIST=""
 MANUAL=""
 ROOT=""
 ESP=""
+SWAP=""
+SWAP_SIZE=""
 
-
-usage() {
-echo "Usage: $0 -d <Disk> [-hdcptHmre]
+usage() { echo "Usage: $0 (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHre]
+Required:
+    -d|--disk      <Disk>        Specify disk for automated partion creation installation. 
+    -m|--manual                  For manual partition selection. --disk will be ignored.
+    -r|--root      <Partition>   Root partition(/). Only needed if --manual
+    -e|--esp       <Partition>   EFI system partiton. Only needed if --manual
+    
 Options:
     -h|--help                    print this message
-    -d|--disk      <Disk>        Specify disk for installation. 
     -c|--country   <Country>     Country for mirrorlist priority. Default: None
     -p|--pkg-list  <Package ...> Additional packages to install
     -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
     -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
-    -m|--manual                  For manual partition selection. --disk will be ignored.
-    -r|--root                    Root partition(/). Only needed if --manual
-    -e|--esp                     EFI system partiton. Only needed if --manual
+    --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk.
+    -s|--swap      <Partition>   Use partition as swap. Works only with --manual
     "
+}
+check_size(){
+    local size="${1}"
+    local check=$(echo "${size}" | grep -Po "\d+[KMGTP]")
+    if [ "${size}" != "${check}" ]; then
+        echo "Wrong size ${size}, must be: size{K,M,G,T,P}"
+        exit
+    fi  
 }
 format_part() {
     local root=${1}
@@ -34,7 +46,12 @@ format_part() {
 
 make_part() {
     local disk=${1}
-    printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
+    local swap_size=${2}
+    if [ -z "${swap_size}" ]; then
+        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
+    else
+        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n+${swap_size}\nt\n2\n19\nn\n\n\n\nw\n" | fdisk ${disk}
+    fi
 }
 mount_part() {
     local root=${1}
@@ -67,8 +84,6 @@ if (($# == 0 )); then
 fi
 
 #TODO:
-# --swap|-s
-# --with-swap 
 # --bootloader|-b   
 # --lvm
 # --LUKS/--dm-crypt
@@ -80,7 +95,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     -d|--disk)
         if [ "${2:0:1}" == '-' ]; then
-            usage
+            echo "--disk cant be empty"
             exit
         fi
         DISK="$2"
@@ -110,16 +125,38 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
     -r|--root)
+        if [ "${2:0:1}" == '-' ]; then
+            echo "--root cant be empty"
+            exit
+        fi
         ROOT="$2"
         shift 2
         ;;
     -e|--esp)
+        if [ "${2:0:1}" == '-' ]; then
+            echo "--esp cant be empty"
+            exit
+        fi
         ESP="$2"
         shift 2
+        ;;
+    -s|--swap)
+        SWAP="$2"
+        shift 2
+        ;;
+    --with-swap)
+        check_size "$2"
+        SWAP_SIZE="$2"
+        shift 2
+        ;;
+    *)
+        echo "Wrong argument: $1"
+        exit
         ;;
     esac
 done
 
+#Check --root and --esp was specified for --manual
 if [ -n "${MANUAL}" ]; then
     if [ -z "${ESP}" ]; then
         echo "--esp must be specified for --manual"
@@ -128,21 +165,31 @@ if [ -n "${MANUAL}" ]; then
         echo "--root must be specified for --manual"
         exit
     fi
-fi
-
-if [ -z "${MANUAL}" ]; then
+#If not manual, then check for --with-swap was specified and select partition numbers accordingly.
+else
     ESP="${DISK}1"
-    ROOT="${DISK}2"
+    if [ -z "${SWAP_SIZE}" ]; then
+        ROOT="${DISK}2"
+    else
+        SWAP="${DISK}2"
+        ROOT="${DISK}3"
+    fi
 fi
 
 timedatectl set-ntp true
 
 #If not --manual set then new GUID partition table will be created on $DISK
 #New partition table will be like:
-#/dev/sdX1 /boot ESP  200M
-#/dev/sdX2 /     ext4 rest
+#$ESP /boot ESP  200M
+#$SWAP?          SIZE
+#$ROOT /    ext4 rest
 if [ -z "${MANUAL}" ]; then
-    make_part ${DISK} 
+    make_part ${DISK} ${SWAP_SIZE} 
+fi
+
+if [ -n "${SWAP}" ]; then
+    mkswap "${SWAP}"
+    swapon "${SWAP}"
 fi
 
 #Format ESP to vfat and ROOT to ext4
