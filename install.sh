@@ -28,13 +28,20 @@ Options:
     --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk.
     -s|--swap      <Partition>   Use partition as swap. Works only with --manual
     "
+    exit
+}
+check_arg_empty() {
+    if [ "$#" == "1" -o "${2:0:1}" == "-" ]; then
+        echo "Error: ${1} cant be empty" >&2
+        exit
+    fi
 }
 check_size(){
     local size="${1}"
     local check=$(echo "${size}" | grep -Po "\d+[KMGTP]")
     if [ "${size}" != "${check}" ]; then
-        echo "Wrong size ${size}, must be: size{K,M,G,T,P}"
-        exit
+        echo "Wrong size ${size}, must be: size{K,M,G,T,P}" >&2
+        exit 
     fi  
 }
 format_part() {
@@ -78,9 +85,8 @@ run_chrooted() {
 }
 
 #Exit if there is no args, 
-if (($# == 0 )); then 
+if (($# == 0)); then 
     usage
-    exit
 fi
 
 #TODO:
@@ -91,17 +97,14 @@ while [[ $# -gt 0 ]]; do
     case "$1" in 
     -h|--help)
         usage
-        exit
         ;;
     -d|--disk)
-        if [ "${2:0:1}" == '-' ]; then
-            echo "--disk cant be empty"
-            exit
-        fi
+        check_arg_empty
         DISK="$2"
         shift 2
         ;;
     -c|--country)
+        check_arg_empty
         COUNTRY="$2"
         shift 2
         ;;
@@ -113,10 +116,12 @@ while [[ $# -gt 0 ]]; do
         done
         ;;
     -t|--timezone)
+        check_arg_empty
         TIMEZONE="$2"
         shift 2
         ;;
     -H|--hostname)
+        check_arg_empty
         HOSTNAME="$2"
         shift 2
         ;;
@@ -125,26 +130,22 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
     -r|--root)
-        if [ "${2:0:1}" == '-' ]; then
-            echo "--root cant be empty"
-            exit
-        fi
+        check_arg_empty
         ROOT="$2"
         shift 2
         ;;
     -e|--esp)
-        if [ "${2:0:1}" == '-' ]; then
-            echo "--esp cant be empty"
-            exit
-        fi
+        check_arg_empty
         ESP="$2"
         shift 2
         ;;
     -s|--swap)
+        check_arg_empty
         SWAP="$2"
         shift 2
         ;;
     --with-swap)
+        check_arg_empty
         check_size "$2"
         SWAP_SIZE="$2"
         shift 2
@@ -155,6 +156,11 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
+
+if [ -z "${MANUAL}" -a -z "${DISK}" ]; then
+    echo "Error: At least --disk or --manual must be specified. For more info see --help" >&2 
+    exit
+fi
 
 #Check --root and --esp was specified for --manual
 if [ -n "${MANUAL}" ]; then
