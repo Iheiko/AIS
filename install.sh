@@ -30,7 +30,7 @@ Options:
     "
     exit
 }
-check_arg_empty() {
+check_arg_empty() { 
     if [ "$#" == "1" -o "${2:0:1}" == "-" ]; then
         echo "Error: ${1} cant be empty" >&2
         exit
@@ -99,12 +99,12 @@ while [[ $# -gt 0 ]]; do
         usage
         ;;
     -d|--disk)
-        check_arg_empty
+        check_arg_empty $@
         DISK="$2"
         shift 2
         ;;
     -c|--country)
-        check_arg_empty
+        check_arg_empty $@
         COUNTRY="$2"
         shift 2
         ;;
@@ -116,12 +116,12 @@ while [[ $# -gt 0 ]]; do
         done
         ;;
     -t|--timezone)
-        check_arg_empty
+        check_arg_empty $@
         TIMEZONE="$2"
         shift 2
         ;;
     -H|--hostname)
-        check_arg_empty
+        check_arg_empty $@
         HOSTNAME="$2"
         shift 2
         ;;
@@ -130,22 +130,22 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
     -r|--root)
-        check_arg_empty
+        check_arg_empty $@
         ROOT="$2"
         shift 2
         ;;
     -e|--esp)
-        check_arg_empty
+        check_arg_empty $@
         ESP="$2"
         shift 2
         ;;
     -s|--swap)
-        check_arg_empty
+        check_arg_empty $@
         SWAP="$2"
         shift 2
         ;;
     --with-swap)
-        check_arg_empty
+        check_arg_empty $@
         check_size "$2"
         SWAP_SIZE="$2"
         shift 2
