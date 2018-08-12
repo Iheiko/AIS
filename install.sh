@@ -6,13 +6,16 @@ PWD="${0%/*}"
 DISK=""
 COUNTRY=""
 PKG_LIST=""
+HOSTNAME="Arch"
 MANUAL=""
 ROOT=""
 ESP=""
 SWAP=""
 SWAP_SIZE=""
 
-usage() { echo "Usage: $0 (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHre]
+BOOTLOADERS=("systemd-boot" "grub")
+
+usage() { echo "Usage: $0 (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHsb]
 Required:
     -d|--disk      <Disk>        Specify disk for automated partion creation installation. 
     -m|--manual                  For manual partition selection. --disk will be ignored.
@@ -23,10 +26,11 @@ Options:
     -h|--help                    print this message
     -c|--country   <Country>     Country for mirrorlist priority. Default: None
     -p|--pkg-list  <Package ...> Additional packages to install
-    -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
-    -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
+    -t|--timezone  <Region/City> Specify timezone. Default:\"UTC\"
+    -H|--hostname  <Hostname>    Hostname for installed system. Default:\"Arch\"
     --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk.
     -s|--swap      <Partition>   Use partition as swap. Works only with --manual
+    --bootloader   <Bootloader>  grub or systemd-boot. Default:\"systemd-boot\"
     "
     exit
 }
@@ -84,7 +88,7 @@ run_chrooted() {
     chmod a+x /mnt/root/chrooted.sh
     arch-chroot /mnt \
         env DISK="${DISK}" TIMEZONE="${TIMEZONE}" HOSTNAME="${HOSTNAME}" \
-        ESP="${ESP}" ROOT="${ROOT}" \
+        ESP="${ESP}" ROOT="${ROOT}" BOOTLOADER="${BOOTLOADER}"\
         bash root/chrooted.sh
     rm /mnt/root/chrooted.sh
 }
@@ -95,7 +99,6 @@ if (($# == 0)); then
 fi
 
 #TODO:
-# --bootloader|-b   
 # --lvm
 # --LUKS/--dm-crypt
 while [[ $# -gt 0 ]]; do
@@ -153,6 +156,18 @@ while [[ $# -gt 0 ]]; do
         check_arg_empty $@
         check_size "$2"
         SWAP_SIZE="$2"
+        shift 2
+        ;;
+    --bootloader)
+        check_arg_empty $@
+        if [[ ! " ${BOOTLOADERS[@]} " =~ " $2 " ]]; then
+            echo "Error: wrong bootloader $2" >&2
+            exit
+        fi
+        if [[ "$2" == "grub" ]]; then
+            PKG_LIST+=" grub efibootmgr"
+        fi
+        BOOTLOADER="$2"
         shift 2
         ;;
     *)
