@@ -18,7 +18,7 @@ Archlinux install script. EFI installation only.
 
 ## How to use
 ```
-Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHre]
+Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHsb]
 Required:
     -d|--disk      <Disk>        Specify disk for automated partion creation installation.
     -m|--manual                  For manual partition selection. --disk will be ignored.
@@ -26,13 +26,14 @@ Required:
     -e|--esp       <Partition>   EFI system partiton. Only needed if --manual
 
 Options:
-    -h|--help                    print this message
+    -h|--help                    Print this message
     -c|--country   <Country>     Country for mirrorlist priority. Default: None
     -p|--pkg-list  <Package ...> Additional packages to install
-    -t|--timezone  <Region/City> Specify timezone Default:"UTC"
-    -H|--hostname  <Hostname>    Hostname for installed system Default:"Arch"
+    -t|--timezone  <Region/City> Specify timezone. Default:"UTC"
+    -H|--hostname  <Hostname>    Hostname for installed system. Default:"Arch"
     --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk.
     -s|--swap      <Partition>   Use partition as swap. Works only with --manual
+    --bootloader   <Bootloader>  grub or systemd-boot. Default:"systemd-boot"
 ```
 
 ## Troubleshooting

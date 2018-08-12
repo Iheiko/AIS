@@ -25,8 +25,8 @@ Options:
     -h|--help                    print this message
     -c|--country   <Country>     Country for mirrorlist priority. Default: None
     -p|--pkg-list  <Package ...> Additional packages to install
-    -t|--timezone  <Region/City> Specify timezone Default:\"UTC\"
-    -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
+    -t|--timezone  <Region/City> Specify timezone. Default:\"UTC\"
+    -H|--hostname  <Hostname>    Hostname for installed system. Default:\"Arch\"
     --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk.
     -s|--swap      <Partition>   Use partition as swap. Works only with --manual
     --bootloader   <Bootloader>  grub or systemd-boot. Default:\"systemd-boot\"
@@ -98,7 +98,6 @@ if (($# == 0)); then
 fi
 
 #TODO:
-# --bootloader|-b   
 # --lvm
 # --LUKS/--dm-crypt
 while [[ $# -gt 0 ]]; do
@@ -160,7 +159,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     --bootloader)
         check_arg_empty $@
-        if [[ ! " ${array[@]} " =~ " $2 " ]]; then
+        if [[ ! " ${BOOTLOADERS[@]} " =~ " $2 " ]]; then
             echo "Error: wrong bootloader $2" >&2
             exit
         fi
@@ -168,6 +167,7 @@ while [[ $# -gt 0 ]]; do
             PKG_LIST+=" grub efibootmgr"
         fi
         BOOTLOADER="$2"
+        shift 2
         ;;
     *)
         echo "Erorr: unknown argument $1"
