@@ -13,7 +13,8 @@ Archlinux install script. EFI installation only.
 1. Boot Arch live media
 2. `wget -O install git.io/fN5he`
 3. `pacman -U install`
-4. `install.sh`
+4. `rehash`
+5. `install.sh`
 
 ## How to use
 ```
