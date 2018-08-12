@@ -2,11 +2,18 @@
 Archlinux install script. EFI installation only.
 
 ## How to get
+### Using git
 1. Boot Arch live media
 2. `pacman -Syy && pacman -Sdd git`
 3. `git clone https://github.com/Iheiko/AIS`
 4. `cd AIS`
 5. `./install.sh`
+
+### Using pacman
+1. Boot Arch live media
+2. `wget -O install git.io/fN5he`
+3. `pacman -U install`
+4. `install.sh`
 
 ## How to use
 ```
