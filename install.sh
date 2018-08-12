@@ -12,7 +12,9 @@ ESP=""
 SWAP=""
 SWAP_SIZE=""
 
-usage() { echo "Usage: $0 (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHre]
+BOOTLOADERS=("systemd-boot" "grub")
+
+usage() { echo "Usage: $0 (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHsb]
 Required:
     -d|--disk      <Disk>        Specify disk for automated partion creation installation. 
     -m|--manual                  For manual partition selection. --disk will be ignored.
@@ -27,6 +29,7 @@ Options:
     -H|--hostname  <Hostname>    Hostname for installed system Default:\"Arch\"
     --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk.
     -s|--swap      <Partition>   Use partition as swap. Works only with --manual
+    --bootloader   <Bootloader>  grub or systemd-boot. Default:\"systemd-boot\"
     "
     exit
 }
@@ -84,7 +87,7 @@ run_chrooted() {
     chmod a+x /mnt/root/chrooted.sh
     arch-chroot /mnt \
         env DISK="${DISK}" TIMEZONE="${TIMEZONE}" HOSTNAME="${HOSTNAME}" \
-        ESP="${ESP}" ROOT="${ROOT}" \
+        ESP="${ESP}" ROOT="${ROOT}" BOOTLOADER="${BOOTLOADER}"\
         bash root/chrooted.sh
     rm /mnt/root/chrooted.sh
 }
@@ -154,6 +157,17 @@ while [[ $# -gt 0 ]]; do
         check_size "$2"
         SWAP_SIZE="$2"
         shift 2
+        ;;
+    --bootloader)
+        check_arg_empty $@
+        if [[ ! " ${array[@]} " =~ " $2 " ]]; then
+            echo "Error: wrong bootloader $2" >&2
+            exit
+        fi
+        if [[ "$2" == "grub" ]]; then
+            PKG_LIST+=" grub efibootmgr"
+        fi
+        BOOTLOADER="$2"
         ;;
     *)
         echo "Erorr: unknown argument $1"

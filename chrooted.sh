@@ -26,6 +26,10 @@ set_hostname() {
 ::1     localhost.localdomain   localhost\n\
 127.0.1.1   ${hname}.localdomain    ${hname}" >> /etc/hosts
 }
+setup_grub(){
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+    grub-mkconfig -o /boot/grub/grub.cfg
+}
 setup_systemd-boot() {
     local root=${1}
     bootctl --path=/boot install
@@ -48,9 +52,12 @@ set_locale
 #Hostname configuration
 set_hostname "${HOSTNAME}"
 
-#Install and configure systemd-boot
-setup_systemd-boot ${ROOT} 
-
+#Install and configure bootloader
+if [[ "${BOOTLOADER}" == "systemd-boot" ]]; then
+    setup_systemd-boot ${ROOT} 
+elif [[ "${BOOTLOADER}" == "grub" ]]; then
+    setup_grub
+fi
 passwd 
 systemctl enable dhcpcd
 echo DONE!!
