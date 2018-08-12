@@ -5,9 +5,6 @@
 if [ -z "${TIMEZONE}" ]; then
     TIMEZONE="UTC"
 fi
-if [ -z "${HOSTNAME}" ]; then
-    HOSTNAME="Arch"
-fi
 
 set_time() {
     local timezone=${1}
