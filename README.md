@@ -11,7 +11,7 @@ Archlinux install script. EFI installation only.
 
 ### Using pacman
 1. Boot Arch live media
-2. `wget -O install https://git.io/ais020`
+2. `wget -O install https://git.io/AIS021`
 3. `pacman -U install`
 4. `rehash`
 5. `install.sh`
