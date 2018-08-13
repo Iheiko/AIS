@@ -11,7 +11,9 @@ MANUAL=""
 ROOT=""
 ESP=""
 SWAP=""
+HOME=""
 SWAP_SIZE=""
+HOME_SIZE=""
 
 BOOTLOADERS=("systemd-boot" "grub")
 
@@ -28,8 +30,10 @@ Options:
     -p|--pkg-list  <Package ...> Additional packages to install
     -t|--timezone  <Region/City> Specify timezone. Default:\"UTC\"
     -H|--hostname  <Hostname>    Hostname for installed system. Default:\"Arch\"
-    --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk.
-    -s|--swap      <Partition>   Use partition as swap. Works only with --manual
+    --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk
+    --with-home    <Size>        Separate /home partiton of <Size>. Works only with --disk
+    -s|--swap      <Partition>   Use <Partition> as swap. Works only with --manual
+    -m|--home      <Partition>   Use <Partition> as /home. Works only with --manual
     --bootloader   <Bootloader>  grub or systemd-boot. Default:\"systemd-boot\"
     "
     exit
@@ -51,25 +55,43 @@ check_size(){
 format_part() {
     local root=${1}
     local esp=${2}
+    local home=${3}
     yes y | mkfs.vfat $esp
     yes y | mkfs.ext4 $root
+    if [ -n "${home}" ]; then
+        yes y | mkfs.ext4 $home
+    fi
 }
-
+#GLOBAL: $SWAP_SIZE, HOME_SIZE
+#Arguments: $DISK
 make_part() {
     local disk=${1}
-    local swap_size=${2}
-    if [ -z "${swap_size}" ]; then
-        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n\nw\n" | fdisk ${disk}
-    else
-        printf "g\nn\n\n\n+200M\nt\n1\nn\n\n\n+${swap_size}\nt\n2\n19\nn\n\n\n\nw\n" | fdisk ${disk}
+    new_gpt="g\n"
+    new_esp="n\n\n\n+200M\n\t\n1\n"
+    new_swap="n\n\n\n+${SWAP_SIZE}\nt\n2\n19\n"
+    new_home="n\n\n\n+${HOME_SIZE}\n"
+    new_root="n\n\n\n\n"
+    write="w\n"
+    cmd="${new_gpt}${new_esp}"
+    if [ -n "${SWAP_SIZE}" ]; then
+        cmd+="${new_swap}"
     fi
+    if [ -n "${HOME_SIZE}" ]; then
+        cmd+="${new_home}"
+    fi
+    cmd+="${new_root}${write}"
+    printf "${cmd}" | fdisk ${disk}
 }
 mount_part() {
     local root=${1}
     local esp=${2}
+    local home=${3}
     mount ${root} /mnt
     mkdir /mnt/boot
     mount ${esp} /mnt/boot
+    if [ -n "${home}" ]; then
+        mount /mnt/home "${home}"
+    fi
 }
 mirrorlist() {
     local country=${1}
@@ -158,6 +180,17 @@ while [[ $# -gt 0 ]]; do
         SWAP_SIZE="$2"
         shift 2
         ;;
+    --with-home)
+        check_arg_empty $@
+        check_size "$2"
+        HOME_SIZE="$2"
+        shift 2
+        ;;
+    -m|--home)
+        check_arg_empty $@
+        HOME="$2"
+        shift 2
+        ;;
     --bootloader)
         check_arg_empty $@
         if [[ ! " ${BOOTLOADERS[@]} " =~ " $2 " ]]; then
@@ -191,15 +224,20 @@ if [ -n "${MANUAL}" ]; then
         echo "--root must be specified for --manual"
         exit
     fi
-#If not manual, then check for --with-swap was specified and select partition numbers accordingly.
+#If not manual, then check for --with-swap and --with-home was \
+#specified and select partition numbers accordingly.
 else
     ESP="${DISK}1"
-    if [ -z "${SWAP_SIZE}" ]; then
-        ROOT="${DISK}2"
-    else
-        SWAP="${DISK}2"
-        ROOT="${DISK}3"
+    let i=2
+    if [ -n "${SWAP_SIZE}" ]; then
+        SWAP="${DISK}$i"
+        let i++
     fi
+    if [ -n "${HOME_SIZE}" ]; then
+        HOME="${DISK}$i"
+        let i++
+    fi
+    ROOT="${DISK}$i"
 fi
 
 timedatectl set-ntp true
@@ -210,7 +248,7 @@ timedatectl set-ntp true
 #$SWAP?          $SWAP_SIZE
 #$ROOT /    ext4 rest
 if [ -z "${MANUAL}" ]; then
-    make_part ${DISK} ${SWAP_SIZE} 
+    make_part ${DISK} 
 fi
 
 if [ -n "${SWAP}" ]; then
@@ -218,7 +256,7 @@ if [ -n "${SWAP}" ]; then
     swapon "${SWAP}"
 fi
 
-format_part ${ROOT} ${ESP}
+format_part ${ROOT} ${ESP} ${HOME}
 
 mount_part ${ROOT} ${ESP}
 
