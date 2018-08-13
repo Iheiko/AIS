@@ -11,7 +11,7 @@ Archlinux install script. EFI installation only.
 
 ### Using pacman
 1. Boot Arch live media
-2. `wget -O install git.io/fN5he`
+2. `wget -O install https://git.io/ais020`
 3. `pacman -U install`
 4. `rehash`
 5. `install.sh`
@@ -20,7 +20,7 @@ Archlinux install script. EFI installation only.
 ```
 Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHsb]
 Required:
-    -d|--disk      <Disk>        Specify disk for automated partion creation installation.
+    -d|--disk      <Disk>        Specify disk for automated partition creation installation.
     -m|--manual                  For manual partition selection. --disk will be ignored.
     -r|--root      <Partition>   Root partition(/). Only needed if --manual
     -e|--esp       <Partition>   EFI system partiton. Only needed if --manual
