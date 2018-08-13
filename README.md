@@ -18,7 +18,7 @@ Archlinux install script. EFI installation only.
 
 ## How to use
 ```
-Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHsb]
+Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [OPTIONS] 
 Required:
     -d|--disk      <Disk>        Specify disk for automated partion creation installation.
     -m|--manual                  For manual partition selection. --disk will be ignored.

@@ -67,7 +67,7 @@ format_part() {
 make_part() {
     local disk=${1}
     new_gpt="g\n"
-    new_esp="n\n\n\n+200M\n\t\n1\n"
+    new_esp="n\n\n\n+200M\nt\n1\n"
     new_swap="n\n\n\n+${SWAP_SIZE}\nt\n2\n19\n"
     new_home="n\n\n\n+${HOME_SIZE}\n"
     new_root="n\n\n\n\n"
@@ -91,7 +91,7 @@ mount_part() {
     mount ${esp} /mnt/boot
     if [ -n "${home}" ]; then
         mkdir /mnt/home
-        mount /mnt/home "${home}"
+        mount "${home}" /mnt/home
     fi
 }
 mirrorlist() {
