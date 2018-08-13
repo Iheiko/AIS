@@ -90,6 +90,7 @@ mount_part() {
     mkdir /mnt/boot
     mount ${esp} /mnt/boot
     if [ -n "${home}" ]; then
+        mkdir /mnt/home
         mount /mnt/home "${home}"
     fi
 }
