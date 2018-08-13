@@ -33,7 +33,7 @@ Options:
     --with-swap    <Size>        Swap of <Size> will be created. Works only with --disk
     --with-home    <Size>        Separate /home partiton of <Size>. Works only with --disk
     -s|--swap      <Partition>   Use <Partition> as swap. Works only with --manual
-    -m|--home      <Partition>   Use <Partition> as /home. Works only with --manual
+    -l|--home      <Partition>   Use <Partition> as /home. Works only with --manual
     --bootloader   <Bootloader>  grub or systemd-boot. Default:\"systemd-boot\"
     "
     exit
@@ -187,7 +187,7 @@ while [[ $# -gt 0 ]]; do
         HOME_SIZE="$2"
         shift 2
         ;;
-    -m|--home)
+    -l|--home)
         check_arg_empty $@
         HOME="$2"
         shift 2
