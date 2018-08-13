@@ -75,7 +75,12 @@ mirrorlist() {
     mv .mirrorlist.tmp /etc/pacman.d/mirrorlist
 }
 run_chrooted() {
-    cp ${PWD}/chrooted.sh /mnt/root/chrooted.sh
+    if [ ! -f "${PWD}/chrooted.sh" ]; then
+        minor_location='/usr/share/install/chrooted.sh'
+    else
+	minor_location="${PWD}/chrooted.sh"
+    fi
+    cp "${minor_location}" /mnt/root/chrooted.sh
     chmod a+x /mnt/root/chrooted.sh
     arch-chroot /mnt \
         env DISK="${DISK}" TIMEZONE="${TIMEZONE}" HOSTNAME="${HOSTNAME}" \
