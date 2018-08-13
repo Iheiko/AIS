@@ -4,7 +4,7 @@ Archlinux install script. EFI installation only.
 ## How to get
 ### Using git
 1. Boot Arch live media
-2. `pacman -Syy && pacman -Sdd git`
+2. `pacman -Sy && pacman -Sdd git`
 3. `git clone https://github.com/Iheiko/AIS`
 4. `cd AIS`
 5. `./install.sh`
@@ -18,7 +18,7 @@ Archlinux install script. EFI installation only.
 
 ## How to use
 ```
-Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHsb]
+Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [OPTIONS] 
 Required:
     -d|--disk      <Disk>        Specify disk for automated partition creation installation.
     -m|--manual                  For manual partition selection. --disk will be ignored.
