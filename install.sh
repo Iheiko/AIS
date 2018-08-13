@@ -258,7 +258,7 @@ fi
 
 format_part ${ROOT} ${ESP} ${HOME}
 
-mount_part ${ROOT} ${ESP}
+mount_part ${ROOT} ${ESP} ${HOME}
 
 #Generate mirrorlist with $COUNTRY repo priority if provided
 if [ -n "${COUNTRY}" ]; then
