@@ -56,5 +56,4 @@ elif [[ "${BOOTLOADER}" == "grub" ]]; then
     setup_grub
 fi
 passwd 
-systemctl enable dhcpcd
 echo DONE!!

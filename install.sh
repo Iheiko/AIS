@@ -57,7 +57,7 @@ format_part() {
     local root=${1}
     local esp=${2}
     local home=${3}
-    yes y | mkfs.vfat $esp
+    yes y | mkfs.fat -F 32 $esp
     yes y | mkfs.ext4 $root
     if [ -n "${home}" ]; then
         yes y | mkfs.ext4 $home
@@ -267,7 +267,7 @@ if [ -n "${COUNTRY}" ]; then
     mirrorlist ${COUNTRY}
 fi
 
-pacstrap /mnt base ${PKG_LIST}
+pacstrap /mnt base linux ${PKG_LIST}
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
