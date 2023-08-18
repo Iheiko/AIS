@@ -9,13 +9,6 @@ Archlinux install script. EFI installation only.
 4. `cd AIS`
 5. `./install.sh`
 
-### Using pacman
-1. Boot Arch live media
-2. `wget -O install https://git.io/AIS021`
-3. `pacman -U install`
-4. `rehash`
-5. `install.sh`
-
 ## How to use
 ```
 Usage: ./install.sh (-d <Disk> | -m -r <Partition> -e <Partition>) [-hcptHsb]
@@ -39,12 +32,6 @@ Options:
 ```
 
 ## Troubleshooting
-1. If you encounter something like this:
-```
- error: Partition / too full: 88218 blocks needed, 62335 blocks are free
-```
-Then you should resize your cowspace to, at least, 512Mb: `mount -o remount,size=512M /run/archiso/cowspace`
+### 1. **error: Partition / too full: X blocks needed, Y blocks are free**
 
-2. VBox crashes after writing partition table.
-
-Change your vdisk format to vdi.
+Resize your cowspace to, at least, 512Mb: `mount -o remount,size=512M /run/archiso/cowspace`
